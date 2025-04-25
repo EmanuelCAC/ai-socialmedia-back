@@ -1,24 +1,15 @@
 import { LoginDto } from "./dto/login.dto";
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from './schemas/user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Inject, Injectable } from '@nestjs/common';
 import { RegisterDto } from "./dto/register.dto";
+import { UserRepository } from "src/db/user/user.repository";
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
-
-  private async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = new this.userModel(createUserDto);
-    return newUser.save();
-  }
-
-  private async findUserByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({ email }).exec();
-  }
-
+  constructor(
+    @Inject('USER_REPOSITORY')
+    private userRepository: UserRepository,
+  ) {}
+  
   public login(loginDto: LoginDto) {
     return {
       message: "Login successful",
@@ -27,9 +18,17 @@ export class AuthService {
   }
 
   public register(loginDto: RegisterDto) {
-    return {
-      message: "Register successful",
-      user: loginDto,
-    };
+    try {
+      const createdUser = this.userRepository.createUser(loginDto.email, loginDto.password);
+      return {
+        message: "Register successful",
+        user: createdUser,
+      };
+    } catch (error) {
+      return {
+        message: "Register failed",
+        error: error.message,
+      };
+    }
   }
 }
