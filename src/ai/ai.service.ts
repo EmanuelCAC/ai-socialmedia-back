@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { GenerativeModel, GoogleGenerativeAI } from "@google/generative-ai";
-
+import { GenerativeModel, GoogleGenerativeAI, GenerateContentResult } from "@google/generative-ai";
 @Injectable()
 export class AiService {
   private apiKey
@@ -42,10 +41,10 @@ export class AiService {
       history: [], // TODO: Add chat history if needed
     });
 
-    const response: any = await chatSession.sendMessage(prompt);
+    const response: GenerateContentResult = await chatSession.sendMessage(prompt); 
 
-    console.log("AI response:", response.text);
+    console.log("AI response:", response.response.candidates?.[0]?.content?.parts?.[0]?.text || "No response");
 
-    return response
+    return response;
   }
 }
