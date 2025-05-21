@@ -1,24 +1,19 @@
 import { LoginDto } from "./dto/login.dto";
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from './schemas/user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
 import { RegisterDto } from "./dto/register.dto";
+import { InjectModel } from "@nestjs/mongoose";
+import { User } from "./schemas/user.shema";
+import { Model } from "mongoose";
+import * as bcrypt from "bcrypt";
+
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
-
-  private async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = new this.userModel(createUserDto);
-    return newUser.save();
-  }
-
-  private async findUserByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({ email }).exec();
-  }
-
+  constructor(
+    @InjectModel(User.name)
+    private userModel: Model<User>
+  ) {}
+  
   public login(loginDto: LoginDto) {
     return {
       message: "Login successful",
@@ -26,10 +21,21 @@ export class AuthService {
     };
   }
 
-  public register(loginDto: RegisterDto) {
-    return {
-      message: "Register successful",
-      user: loginDto,
-    };
+  public async register(registerDto: RegisterDto) {
+    try {
+      const userExists = await this.userModel.findOne({ email: registerDto.email });
+
+      if (userExists) {
+        throw new Error("User already exists");
+      }
+
+      const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+      registerDto.password = hashedPassword;
+
+      const newUser = new this.userModel(registerDto);
+      return await newUser.save();
+    } catch (error) {
+      throw new Error("Error during registration");
+    }
   }
 }
