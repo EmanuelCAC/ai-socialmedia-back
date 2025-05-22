@@ -32,9 +32,9 @@ export class AuthService {
         throw new Error("User not found");
       }
 
-      console.log(process.env.SECRET_KEY)
+      console.log("Generate token: " + process.env.SECRET_KEY)
 
-      const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY || "", { expiresIn: '5m' });
+      const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY || "", { expiresIn: '30m' });
 
       return token
 

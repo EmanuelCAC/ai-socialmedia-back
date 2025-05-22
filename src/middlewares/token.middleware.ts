@@ -7,21 +7,18 @@ dotenv.config();
 @Injectable()
 export class TokenMiddleware implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
-    const authHeader = request.headers['authorization'];
-    
-    console.log("Authorization Header:", authHeader);
+    try {
+      const request = context.switchToHttp().getRequest();
+      const authHeader = request.headers['authorization'];
+  
+      const token: string = authHeader && authHeader.split('Bearer ')[1];
 
-    const token: string = authHeader && authHeader.split('Bearer')[1];
-
-    console.log(process.env.SECRET_KEY)
-
-    const verifyToken = jwt.verify(token, process.env.SECRET_KEY || "")
-
-    console.log("Token:", verifyToken);
-
-    // !!authHeader && authHeader.startsWith('Bearer ')
-
-    return true;
+      const verifyToken = jwt.verify(token, process.env.SECRET_KEY || "")
+      
+      return  verifyToken && authHeader.startsWith('Bearer ');
+    } catch (error) {
+      console.error("error: " + error.message)
+      throw new Error (error.message)
+    }
   }
 }
