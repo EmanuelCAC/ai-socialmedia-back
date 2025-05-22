@@ -51,7 +51,7 @@ export class AiService {
       const response: GenerateContentResult = await chatSession.sendMessage(prompt); 
   
       return response.response.candidates?.[0].content.parts
-      [0].text;
+      [0];
     } catch (error) {
       console.error("error: " + error.message)
       throw new Error(error.message)
