@@ -13,8 +13,26 @@ export class AuthController {
   ) {}
 
   @Post("/login")
-  public login(@Body() loginDto: LoginDto) {
-     return this.authService.login(loginDto);
+  public async login(@Body() loginDto: LoginDto) {
+    try {
+      await this.authService.login(loginDto);
+
+      return {
+        status: HttpStatus.OK,
+        message: "User logged in successfully",
+      };
+    } catch (error) {
+      if (error.message.includes("User not found")) {
+        return {
+          status: HttpStatus.UNAUTHORIZED,
+          message: "Invalid email or password",
+        };
+      }
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: "Error during login",
+      };
+    }
   }
 
   @Post("/register")
@@ -27,21 +45,15 @@ export class AuthController {
       };
     } catch (error) {
       if (error.message.includes("User already exists")) {
-        return new HttpException(
-          {
-            status: HttpStatus.CONFLICT,
-            message: "User already exists",
-          },
-          HttpStatus.CONFLICT
-        );
+        return {
+          status: HttpStatus.CONFLICT,
+          message: "User already exists",
+        }
       }
-      return new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: "Error during registration",
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: "Error during registration",
+      }
     }
   }
 }

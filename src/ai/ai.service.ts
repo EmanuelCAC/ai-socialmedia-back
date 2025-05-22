@@ -16,7 +16,10 @@ export class AiService {
   public initializeAI(context: string): Promise<any> {
     try {
       this.apiKey = process.env.GEMINI_API_KEY;
-      this.genAI = new GoogleGenerativeAI('AIzaSyAQBQ8qQEJh6eiPRhBHf5b4RkO_g30lkxQ');
+      this.genAI = new GoogleGenerativeAI(this.apiKey);
+
+      // verify in the database if the user context already exists
+
       this.model =  this.genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         systemInstruction: context,
