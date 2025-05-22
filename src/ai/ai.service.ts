@@ -41,16 +41,20 @@ export class AiService {
     if (!this.model) {
       throw new Error("AI model is not initialized. Please initialize it first.");
     }
-    
-    const chatSession = this.model.startChat({
-      ...this.generationConfig,
-      history: [], // TODO: Add chat history if needed
-    });
 
-    const response: GenerateContentResult = await chatSession.sendMessage(prompt); 
-
-    console.log("AI response:", response.response.candidates?.[0]?.content?.parts?.[0]?.text || "No response");
-
-    return response.response.candidates;
+    try {
+      const chatSession = this.model.startChat({
+        ...this.generationConfig,
+        history: [], 
+      });
+  
+      const response: GenerateContentResult = await chatSession.sendMessage(prompt); 
+  
+      return response.response.candidates?.[0].content.parts
+      [0].text;
+    } catch (error) {
+      console.error("error: " + error.message)
+      throw new Error(error.message)
+    }
   }
 }
