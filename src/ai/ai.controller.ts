@@ -1,5 +1,6 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards } from "@nestjs/common";
 import { AiService } from "./ai.service";
+import { TokenMiddleware } from "src/middlewares/token.middleware";
 
 @Controller("/ai")
 export class AiController {
@@ -19,6 +20,7 @@ export class AiController {
   }
 
   @Post("/prompt")
+  @UseGuards(TokenMiddleware)
   async getPrompt(@Body("prompt") prompt: string): Promise<any> {
     try {
       const response = await this.aiService.getPrompt(prompt);
