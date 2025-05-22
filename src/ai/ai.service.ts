@@ -1,5 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { GenerativeModel, GoogleGenerativeAI, GenerateContentResult } from "@google/generative-ai";
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 @Injectable()
 export class AiService {
   private apiKey

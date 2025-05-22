@@ -5,6 +5,10 @@ import { InjectModel } from "@nestjs/mongoose";
 import { User } from "./schemas/user.shema";
 import { Model } from "mongoose";
 import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 
 @Injectable()
@@ -15,15 +19,6 @@ export class AuthService {
   ) {}
   
   public async login(loginDto: LoginDto) {
-
-    // verify user email
-    // verify user password
-    // if user is not found, throw error
-    // if password is incorrect, throw error
-
-    // if user is found and password is correct, return jwt token
-
-
     try {
       const user: any = await this.userModel.findOne({ email: loginDto.email });
 
@@ -37,9 +32,11 @@ export class AuthService {
         throw new Error("User not found");
       }
 
-      // Generate JWT token here
-      // const token = this.jwtService.sign({ id: user._id });
-      // return { token };
+      console.log(process.env.SECRET_KEY)
+
+      const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY || "", { expiresIn: '5m' });
+
+      return token
 
     } catch (error) {
       console.error(error);

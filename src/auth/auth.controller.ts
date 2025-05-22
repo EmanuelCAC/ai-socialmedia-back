@@ -1,10 +1,7 @@
-import { Body, Controller, HttpException, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, HttpStatus, Post } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
-
-  // fazer conexão com o banco de dados e fazer a validação do usuário
-  // fazer a validação do usuário com o banco de dados e retornar o token JWT
 
 @Controller("/auth")
 export class AuthController {
@@ -15,11 +12,12 @@ export class AuthController {
   @Post("/login")
   public async login(@Body() loginDto: LoginDto) {
     try {
-      await this.authService.login(loginDto);
+      const token = await this.authService.login(loginDto);
 
       return {
         status: HttpStatus.OK,
         message: "User logged in successfully",
+        token: token,
       };
     } catch (error) {
       if (error.message.includes("User not found")) {
