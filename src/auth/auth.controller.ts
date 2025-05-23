@@ -42,6 +42,7 @@ export class AuthController {
         message: "User registered successfully",
       };
     } catch (error) {
+      console.error(error)
       if (error.message.includes("User already exists")) {
         return {
           status: HttpStatus.CONFLICT,

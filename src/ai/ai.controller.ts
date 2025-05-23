@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { AiService } from "./ai.service";
 import { TokenMiddleware } from "src/middlewares/token.middleware";
 
@@ -27,7 +27,10 @@ export class AiController {
       return response;
     } catch (error) {
       console.error("Error getting prompt:", error);
-      throw new Error("Failed to get prompt from AI model");
+      return {
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST
+      }
     }
   }
 }
